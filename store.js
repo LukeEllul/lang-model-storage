@@ -7,9 +7,12 @@ const getValue = map => map.first();
 
 const mergeValues = (v1, v2) => v1.mergeDeep(v2);
 
-const openStore = storeLocation => Promise.resolve(level(storeLocation, { valueEncoding: 'json' }));
+function openStore(storeLocation) {
+    this[storeLocation] = this[storeLocation] || level(storeLocation, { valueEncoding: 'json' });
+    return Promise.resolve(this[storeLocation]);
+}
 
-const storeInDatabase = list => databaseLocation =>
+const storeInDatabase = location => list =>
     list.reduce(
         (store, map) => {
             const key = getKey(map);
@@ -26,9 +29,10 @@ const storeInDatabase = list => databaseLocation =>
                 )
             })
         },
-        openStore(location)
+        openStore('./lang-model-storage/databases/' + location)
     );
 
 module.exports = {
-    storeInDatabase
+    storeInDatabase,
+    openStore
 }
